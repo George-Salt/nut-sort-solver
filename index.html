@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Nut Sort Solver</title>
+
+  <link rel="stylesheet" href="static/css/main.css">
+</head>
+
+<body>
+  <main>
+    <div class="about">
+      <h1>Nut Sort</h1>
+      <p class="tip">Нажимай на цвета ниже, чтобы задать стартовую позицию 😉</p>
+    </div>
+
+    <div class="setting">
+      <div class="buttons-container">
+        <div class="buttons">
+          <div class="button red" onclick="addColor('red')"></div>
+          <div class="button orange" onclick="addColor('orange')"></div>
+          <div class="button yellow" onclick="addColor('yellow')"></div>
+          <div class="button green" onclick="addColor('green')"></div>
+          <div class="button light-blue" onclick="addColor('light-blue')"></div>
+          <div class="button blue" onclick="addColor('blue')"></div>
+        </div>
+
+        <div class="buttons">
+          <div class="button pink" onclick="addColor('pink')"></div>
+          <div class="button purple" onclick="addColor('purple')"></div>
+          <div class="button violet" onclick="addColor('violet')"></div>
+          <div class="button black" onclick="addColor('black')"></div>
+          <div class="button white" onclick="addColor('white')"></div>
+          <div class="button empty" onclick="addEmptyTower()">+</div>
+        </div>
+      </div>
+
+      <p>Твоя позиция:</p>
+
+      <div class="towers"></div>
+
+      <div class="button start" onclick="main()">Решить</div>
+    </div>
+
+    <div class="answer">
+      <p>😍 Решение:</p>
+      <p class="solution"></p>
+      <p class="steps"></p>
+    </div>
+
+    <p class="no-answer">Нет решений 😢</p>
+  </main>
+
+  <script>
+    function addColor(color) {
+      if (startPosition.length == 0) {
+        startPosition.push([color]);
+      } else if ((startPosition[startPosition.length - 1].length >= 4) || (startPosition[startPosition.length - 1] == [])) {
+        startPosition.push([color]);
+      } else {
+        startPosition[startPosition.length - 1].unshift(color);
+      };
+
+      let lastTower = document.querySelector(".tower:last-of-type");
+      if (!lastTower) {
+        let towersContainer = document.querySelector(".towers");
+        let newTower = document.createElement("div");
+        newTower.classList.add("tower");
+        towersContainer.appendChild(newTower);
+      } else if ((lastTower.classList.contains("empty")) || (lastTower.children.length >= 4)) {
+        let towersContainer = document.querySelector(".towers");
+        let newTower = document.createElement("div");
+        newTower.classList.add("tower");
+        towersContainer.appendChild(newTower);
+      };
+
+      lastTower = document.querySelector(".tower:last-of-type");
+      let newNut = document.createElement("div");
+      newNut.classList.add("nut", color);
+      lastTower.appendChild(newNut);
+    };
+
+    function addEmptyTower() {
+      startPosition.push([]);
+
+      let towersContainer = document.querySelector(".towers");
+      let newTower = document.createElement("div");
+      newTower.classList.add("tower", "empty");
+      towersContainer.appendChild(newTower);
+    };
+
+    function heuristic(state) {
+      let cost = 0;
+      for (let stack of state) {
+        if (stack.length > 4 || (stack.length > 0 && new Set(stack).size !== 1)) {
+          cost += stack.length;
+        };
+      };
+      return cost;
+    };
+
+    function isGoalState(state) {
+      for (let stack of state) {
+        if (stack.length > 4 || (stack.length > 0 && new Set(stack).size !== 1)) {
+          return false;
+        };
+      };
+      return true;
+    };
+
+    function generateNextStates(state) {
+      const nextStates = [];
+      for (let fromCol = 0; fromCol < state.length; fromCol++) {
+        for (let toCol = 0; toCol < state.length; toCol++) {
+          if (fromCol !== toCol && state[fromCol].length > 0) {
+            let newState = state.map(stack => [...stack]);
+            let topGearColor = newState[fromCol][newState[fromCol].length - 1];
+            if (!newState[toCol].length || newState[toCol][newState[toCol].length - 1] === topGearColor) {
+              let gearsToMove = [];
+              while (newState[fromCol].length > 0 && newState[fromCol][newState[fromCol].length - 1] === topGearColor) {
+                gearsToMove.push(newState[fromCol].pop());
+              };
+
+              if (newState[toCol].length + gearsToMove.length <= 4) {
+                for (let gear of gearsToMove.reverse()) {
+                  newState[toCol].push(gear);
+                };
+                nextStates.push([newState, [fromCol, toCol]]);
+              };
+            };
+          };
+        };
+      };
+      return nextStates;
+    };
+
+    function solveGame(startPosition) {
+      let priorityQueue = [[heuristic(startPosition), 0, startPosition.map(stack => [...stack]), []]];
+      let visited = new Set();
+      visited.add(JSON.stringify(startPosition));
+
+      while (priorityQueue.length > 0) {
+        priorityQueue.sort((a, b) => a[0] - b[0]); // Min-heap emulation
+        let [, cost, currentState, moves] = priorityQueue.shift();
+
+        if (isGoalState(currentState)) {
+          return moves;
+        };
+
+        for (let [nextState, move] of generateNextStates(currentState)) {
+          let stateTuple = JSON.stringify(nextState);
+          if (!visited.has(stateTuple)) {
+            visited.add(stateTuple);
+            priorityQueue.push([cost + heuristic(nextState), cost + 1, nextState, [...moves, move]]);
+          };
+        }
+      };
+      return null;
+    };
+
+    function main() {
+      const solution = solveGame(startPosition);
+
+      let tipElement = document.querySelector(".about .tip");
+      let settingContainer = document.querySelector(".setting");
+      let answerContainer = document.querySelector(".answer");
+      let solutionElement = document.querySelector(".answer .solution");
+      let stepsElement = document.querySelector(".answer .steps");
+
+      let solutionText = "";
+      let stepsText = "";
+      if (solution) {
+        solutionText = solution.map(move => `${move[0] + 1} » ${move[1] + 1}`).join("<br>");
+        stepsText = `Шагов: ${solution.length}`;
+
+        solutionElement.innerHTML = solutionText;
+        stepsElement.innerHTML = stepsText;
+
+        answerContainer.style.display = "flex";
+      } else {
+        let noAnswerContainer = document.querySelector(".no-answer");
+        noAnswerContainer.style.display = "block";
+      };
+      settingContainer.style.display = "none";
+      tipElement.style.display = "none";
+    };
+
+    const startPosition = [];
+  </script>
+</body>
+
+</html>

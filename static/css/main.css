@@ -1,0 +1,169 @@
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+
+body {
+  text-align: center;
+  font-family: "Unbounded", sans-serif;
+  overflow: hidden;
+  height: 100vh;
+}
+
+main {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.setting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.buttons-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.button {
+  width: 25px;
+  height: 25px;
+  border-radius: 100%;
+  cursor: pointer;
+}
+
+.towers {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tower {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tower .nut {
+  width: 50px;
+  height: 25px;
+  border-radius: 10px;
+}
+
+.button.light-blue,
+.nut.light-blue {
+  background: #21a5f0;
+}
+
+.button.pink,
+.nut.pink {
+  background: #fe6194;
+}
+
+.button.blue,
+.nut.blue {
+  background: #1862df;
+}
+
+.button.white,
+.nut.white {
+  background: #beb3d3;
+}
+
+.button.purple,
+.nut.purple {
+  background: #e901a2;
+}
+
+.button.red,
+.nut.red {
+  background: #e91e3c;
+}
+
+.button.yellow,
+.nut.yellow {
+  background: #f8b327;
+}
+
+.button.beige,
+.nut.beige {
+  background: #f3ac9a;
+}
+
+.button.violet,
+.nut.violet {
+  background: #921396;
+}
+
+.button.green,
+.nut.green {
+  background: #93cc3d;
+}
+
+.button.black,
+.nut.black {
+  background: #333333;
+}
+
+.button.orange,
+.nut.orange {
+  background: #f74e25;
+}
+
+.button.empty {
+  width: 21px;
+  height: 21px;
+  border: 2px solid #ccc;
+  color: gray;
+}
+
+.tower.empty {
+  width: 46px;
+  height: 104px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+}
+
+.button.start {
+  width: fit-content;
+  height: fit-content;
+  padding: 10px 15px;
+  background: #eee;
+  border-radius: 15px;
+  cursor: pointer;
+}
+
+.answer {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.answer .solution {
+  padding: 15px 25px;
+  border-radius: 15px;
+  border: 2px solid #ccc;
+}
+
+.no-answer {
+  display: none;
+}
